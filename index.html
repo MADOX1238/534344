@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الاختيارات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-image: url('https://gifdb.com/images/high/incredible-sound-wave-art-hxgh3rtf5v8vvh5i.gif');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        .options {
+            display: none;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .name-input {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>نظام الاختيارات</h1>
+    <button id="main-button">اضغط للاختيار</button>
+    <div class="options" id="options">
+        <button onclick="window.location.href='developer.html'">خاص بالمطورين</button>
+        <button onclick="window.location.href='create-room.html'">إنشاء غرفة خاصة</button>
+        <button id="private-chat-btn">الدردشة الخاصة</button>
+    </div>
+    <div class="name-input" id="name-input">
+        <input type="text" id="username" placeholder="أدخل اسمك">
+        <button id="enter-chat-btn">دخول</button>
+    </div>
+    <script>
+        const mainButton = document.getElementById('main-button');
+        const options = document.getElementById('options');
+        const privateChatBtn = document.getElementById('private-chat-btn');
+        const nameInputDiv = document.getElementById('name-input');
+        const enterChatBtn = document.getElementById('enter-chat-btn');
+        const usernameInput = document.getElementById('username');
+
+        // عرض الخيارات عند الضغط
+        mainButton.addEventListener('click', () => {
+            options.style.display = options.style.display === 'none' || options.style.display === '' ? 'block' : 'none';
+            nameInputDiv.style.display = 'none';
+        });
+
+        // عرض حقل إدخال الاسم عند اختيار "الدردشة الخاصة"
+        privateChatBtn.addEventListener('click', () => {
+            nameInputDiv.style.display = 'block';
+        });
+
+        // تخزين اسم المستخدم والتوجيه للدردشة الخاصة
+        enterChatBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            if (username) {
+                localStorage.setItem('username', username);
+                window.location.href = 'private-chat.html';
+            } else {
+                alert('من فضلك أدخل اسمك');
+            }
+        });
+    </script>
+
+</body></html>

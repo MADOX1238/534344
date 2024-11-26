@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدردشة الخاصة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://i.pinimg.com/originals/5e/f7/6f/5ef76fc0b7227f66c914ff1e87d8d8de.gif');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            color: white;
+        }
+        #messages {
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+        }
+        #chatInput {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #activeUsers {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>الدردشة الخاصة</h1>
+    <div id="messages"></div>
+    <textarea id="chatInput" placeholder="اكتب رسالتك هنا..."></textarea>
+    <br>
+    <button id="sendBtn">إرسال</button>
+    <div id="activeUsers">
+        <h3>المتواجدين الآن:</h3>
+        <ul id="userList"></ul>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getDatabase, ref, push, set, onChildAdded, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+        // إعدادات Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCnHSUo_Vu53NidFWYlQ74_CyOyfVW_BqQ",
+            authDomain: "alaah-8d503.firebaseapp.com",
+            databaseURL: "https://alaah-8d503-default-rtdb.firebaseio.com",
+            projectId: "alaah-8d503",
+            storageBucket: "alaah-8d503.firebasestorage.app",
+            messagingSenderId: "365922482892",
+            appId: "1:365922482892:web:a843fbb3594d200c67e069",
+            measurementId: "G-D4TPJW4RT8"
+        };
+
+        // تهيئة Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // اسم الغرفة الخاصة
+        const chatRoom = "privateRoom";
+
+        // اسم المستخدم
+        const username = localStorage.getItem("username");
+        if (!username) {
+            alert("من فضلك أدخل اسمك أولاً!");
+            window.location.href = "index.html";
+        }
+
+        // مرجع المستخدمين والرسائل
+        const activeUsersRef = ref(database, `rooms/${chatRoom}/activeUsers`);
+        const messagesRef = ref(database, `rooms/${chatRoom}/messages`);
+
+        // تسجيل دخول المستخدم
+        const userRef = push(activeUsersRef);
+        set(userRef, { username });
+        onDisconnect(userRef).remove();
+
+        // عرض المستخدمين
+        onValue(activeUsersRef, (snapshot) => {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            snapshot.forEach((childSnapshot) => {
+                const user = childSnapshot.val();
+                const li = document.createElement('li');
+                li.textContent = user.username;
+                userList.appendChild(li);
+            });
+        });
+
+        // إرسال رسالة
+        document.getElementById('sendBtn').addEventListener('click', () => {
+            const message = document.getElementById('chatInput').value.trim();
+            if (message) {
+                const newMessageRef = push(messagesRef);
+                set(newMessageRef, { username, message });
+                document.getElementById('chatInput').value = '';
+            }
+        });
+
+        // عرض الرسائل
+        onChildAdded(messagesRef, (snapshot) => {
+            const messageData = snapshot.val();
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<strong>${messageData.username}:</strong> ${messageData.message}`;
+            document.getElementById('messages').appendChild(messageElement);
+        });
+    </script>
+
+</body></html>
